@@ -116,3 +116,4 @@ SELECT sighting_id, CASE WHEN EXTRACT(HOUR FROM sighting_time) < 12 THEN 'Mornin
 
 --Problem 9: Delete rangers who have never sighted any species
 DELETE FROM rangers WHERE ranger_id NOT IN (SELECT DISTINCT ranger_id FROM sightings);
+
