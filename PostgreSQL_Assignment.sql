@@ -79,8 +79,6 @@ INSERT INTO sightings (species_id, ranger_id, location, sighting_time, notes) VA
 (12, 8, 'Frozen Ridge', '2024-06-06 22:10:00', 'Tracks in snow');
 
 
-
-
 SELECT * FROM rangers;
 SELECT * FROM species;
 SELECT * FROM sightings;
@@ -97,7 +95,7 @@ SELECT COUNT(DISTINCT species_id) as unique_species_count FROM sightings;
 SELECT * FROM sightings WHERE location LIKE '%Pass%';
 
 --Problem 4: List each ranger's name and their total number of sightings.
-SELECT r.name, COUNT(*) as total_sightings FROM sightings as s JOIN rangers as r ON s.ranger_id = r.ranger_id GROUP BY r.name;
+SELECT r.name, COUNT(*) as total_sightings FROM rangers as r LEFT JOIN sightings as s ON s.ranger_id = r.ranger_id GROUP BY r.name;
 
 --Problem 5: List species that have never been sighted. 
 SELECT sp.common_name FROM species as sp LEFT JOIN sightings as s ON s.species_id = sp.species_id WHERE s.sighting_id IS NULL;
