@@ -52,7 +52,8 @@ INSERT INTO species (common_name, scientific_name, discovery_date, conservation_
 ('Indian Wolf', 'Canis lupus pallipes', '1832-06-15', 'Endangered'),
 ('Sloth Bear', 'Melursus ursinus', '1791-11-23', 'Vulnerable'),
 ('Shadow Leopard', 'Panthera shadowus', '2023-09-12', 'Endangered'),
-('Shadow Leopard', 'Panthera pardus nebulosa', '1901-06-15', 'Endangered');
+('Shadow Leopard', 'Panthera pardus nebulosa', '1901-06-15', 'Endangered'),
+('Golden Antelope', 'Antilope aurea', '1795-03-10', 'Endangered');
 
 INSERT INTO sightings (species_id, ranger_id, location, sighting_time, notes) VALUES
 (1, 1, 'Peak Ridge', '2024-05-10 07:45:00', 'Camera trap image captured'),
@@ -101,7 +102,26 @@ SELECT r.name, COUNT(*) as total_sightings FROM sightings as s JOIN rangers as r
 --Problem 5: List species that have never been sighted. 
 SELECT sp.common_name FROM species as sp LEFT JOIN sightings as s ON s.species_id = sp.species_id WHERE s.sighting_id IS NULL;
 
---Problem 6:
+--Problem 6:  Show the most recent 2 sightings.
 SELECT common_name, sighting_time, name from rangers as r JOIN (SELECT * FROM sightings as s JOIN species as sp ON s.species_id = sp.species_id) as ssp ON r.ranger_id = ssp.ranger_id ORDER BY sighting_time DESC LIMIT 2;
 
---Problem 7:
+--Problem 7: Update all species discovered before year 1800 to have status 'Historic'.
+ALTER TABLE species
+DROP CONSTRAINT species_conservation_status_check;
+ALTER TABLE species
+ADD CONSTRAINT species_conservation_status_check CHECK (conservation_status IN ('Endangered', 'Vulnerable', 'Historic'));
+UPDATE species
+SET conservation_status = 'Historic'
+WHERE discovery_date < '1800-01-01';
+
+
+--Problem 8:  Label each sighting's time of day as 'Morning', 'Afternoon', or 'Evening'.
+SELECT sighting_id, CASE WHEN EXTRACT(HOUR FROM sighting_time) < 12 THEN 'Morning' WHEN EXTRACT(HOUR FROM sighting_time) >=12 AND EXTRACT(HOUR FROM sighting_time) < 17 THEN 'Afternoon' ELSE 'Evening' END AS time_of_day FROM sightings;
+
+
+
+--Problem 9: Delete rangers who have never sighted any species
+DELETE FROM rangers
+WHERE ranger_id NOT IN (
+  SELECT DISTINCT ranger_id FROM sightings
+);
